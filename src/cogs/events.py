@@ -19,11 +19,11 @@ class Events(commands.Cog):
         for event in self.scheduled_events:
             event_string += f'{event["date"]} - {event["title"]}\n'
 
-        embed = discord.Embed(color = ctx.me.color, title='Arrangementer i sendingsliste', description=event_string)
+        embed = discord.Embed(color=ctx.me.color, title='Arrangementer i sendingsliste', description=event_string)
         await ctx.send(embed=embed)
 
     @tasks.loop(hours=1.0)
-    async def event_scheduler(self, reconnect = True):
+    async def event_scheduler(self, reconnect=True):
         print('FETCHING EVENTS')
 
         gc = gspread.service_account(filename='./src/config/google-credentials.json')
