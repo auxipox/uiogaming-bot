@@ -13,6 +13,8 @@ class Events(commands.Cog):
         self.scheduled_dates = []
         self.scheduled_events = []
 
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 2, commands.BucketType.guild)
     @commands.command()
     async def arrangementer(self, ctx):
         event_string = ''
