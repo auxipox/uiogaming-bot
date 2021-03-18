@@ -31,6 +31,7 @@ class Bot(commands.Bot):
         self.presence = config['bot'].get('presence', {})
 
         self.api_keys = config.get('api', {})
+        self.event_scheduler = config.get('event_scheduler', {})
 
         self.emoji = config.get('emoji', {})
         self.misc = config.get('misc', {})

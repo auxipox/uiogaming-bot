@@ -3,4 +3,6 @@ pyyaml
 requests
 asyncio
 psutil
+gspread
+aio-timers
 pillow

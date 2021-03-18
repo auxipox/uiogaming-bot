@@ -11,6 +11,12 @@ bot:
 api:
   clarifai: 
 
+# Google event scheduler
+event_scheduler:
+  sheet_id: 
+  guild_id: 
+  channel_id: 
+
 # Emoji
 emoji:
   online: <:online:516328785910431754>
