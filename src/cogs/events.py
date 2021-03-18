@@ -65,7 +65,7 @@ class Events(commands.Cog):
             )
 
     async def event_sender(self, title, description, roles, index):
-        print('SENDING EVENT', title, description)
+        print('SENDING EVENT', title)
 
         guild = self.bot.get_guild(self.bot.event_scheduler['guild_id'])
         channel = self.bot.get_channel(self.bot.event_scheduler['channel_id'])
