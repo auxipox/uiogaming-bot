@@ -12,6 +12,15 @@ from PIL import ImageSequence
 
 from cogs.utils import embed_templates
 
+from typing import Any
+import PIL
+import discord
+from discord import app_commands
+from discord.ext import commands
+from PIL import Image, ImageDraw, ImageFont, ImageSequence
+import aiohttp
+import io
+from moviepy.editor import *
 
 class The(commands.Cog):
     """
@@ -81,10 +90,11 @@ class The(commands.Cog):
 
         Returns
         ----------
-        (discord.File): an image
+        (discord.File): an image or a video
         """
         await interaction.response.defer()
         gif = False
+        video = False
         try:
             bg_data = await self.fetch_image(self.background_url)
             background = Image.open(bg_data)
@@ -92,24 +102,40 @@ class The(commands.Cog):
             image_data = await self.fetch_image(image_url)
 
             if image_data:
-                image = Image.open(image_data)
+                try:
+                    image = Image.open(image_data)
 
-                if image.format.lower() == "gif":
-                    gif = True
-                    frames = []
-                    for frame in ImageSequence.Iterator(image):
-                        frame = frame.convert("RGBA").resize((200, 200), Image.ANTIALIAS)
-                        new_frame = background.copy().convert("RGBA")
-                        new_frame.alpha_composite(frame, (self.x, self.y))
-                        frames.append(new_frame)
+                    if image.format.lower() == "gif":
+                        gif = True
+                        frames = []
+                        for frame in ImageSequence.Iterator(image):
+                            frame = frame.convert("RGBA").resize((200, 200), Image.ANTIALIAS)
+                            new_frame = background.copy().convert("RGBA")
+                            new_frame.alpha_composite(frame, (self.x, self.y))
+                            frames.append(new_frame)
 
-                    draw = ImageDraw.Draw(frames[0], "RGBA")
-                else:
-                    image = image.convert("RGBA").resize((200, 200), Image.ANTIALIAS)
-                    background = background.convert("RGBA")
-                    background.alpha_composite(image, (self.x, self.y))
+                        draw = ImageDraw.Draw(frames[0], "RGBA")
+                    else:
+                        image = image.convert("RGBA").resize((200, 200), Image.ANTIALIAS)
+                        background = background.convert("RGBA")
+                        background.alpha_composite(image, (self.x, self.y))
 
-                    draw = ImageDraw.Draw(background, "RGBA")
+                        draw = ImageDraw.Draw(background, "RGBA")
+
+                except PIL.UnidentifiedImageError:
+                    video = True
+                    video_clip = VideoFileClip(io.BytesIO(image_data.getvalue()))
+                    audio_clip = video_clip.audio
+                    image = video_clip.resize((200, 200))
+
+                    # Convert the background to a video clip with the same duration as the input video
+                    bg_video_clip = ImageClip(background).set_duration(video_clip.duration).resize((1280, 720))
+
+                    # Overlay the input video on the background video
+                    result = CompositeVideoClip([bg_video_clip, image.set_position((self.x, self.y))])
+
+                    # Set the audio of the resulting video
+                    result = result.set_audio(audio_clip)
 
             font = ImageFont.truetype("./src/assets/fonts/impact.ttf", 120)
 
@@ -135,6 +161,18 @@ class The(commands.Cog):
                     )
                     output.seek(0)
                     await interaction.followup.send(file=discord.File(output, "result.gif"))
+            elif video:
+                with io.BytesIO() as output:
+                    result.write_videofile(
+                        output.name,
+                        codec="libx264",
+                        audio_codec="aac",
+                        temp_audiofile="temp_audio.m4a",
+                        remove_temp=True,
+                        threads=4,
+                    )
+                    output.seek(0)
+                    await interaction.followup.send(file=discord.File(output, "result.mp4"))
             else:
                 with io.BytesIO() as output:
                     background.save(output, format="PNG")
