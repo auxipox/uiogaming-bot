@@ -57,10 +57,6 @@ class FunReplies(commands.Cog):
             if (datetime.now() - self.previous_invokations["olof palme"]).seconds > self.cooldown_seconds:
                 await message.reply("Jeg vet hvem som drepte Olof Palme 👀")
                 self.previous_invokations["olof palme"] = datetime.now()
-                
-
-
-        elif re.search(r"(^|\W)olof palme(\W|$)", message_content, flags=re.IGNORECASE):
 
         elif re.search(r"(\W|\s)*le+s+go+(\s|\W)*", message_content):
             if (datetime.now() - self.previous_invokations["lesgo"]).seconds > self.cooldown_seconds:
