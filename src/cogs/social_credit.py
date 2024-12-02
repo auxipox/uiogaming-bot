@@ -313,7 +313,7 @@ class SocialCredit(commands.Cog):
         message (discord.Message): The message object
         """
 
-        illegal_hours = [5, 6, 7, 8, 9]
+        illegal_hours = [6, 7, 8, 9]
 
         if message.created_at.hour in illegal_hours:
             await self.social_punishment(message.author.id, 10, "early-bird")
@@ -328,7 +328,7 @@ class SocialCredit(commands.Cog):
         message (discord.Message): The message object
         """
 
-        happy_hours = [1, 2, 3, 4]
+        happy_hours = [1, 2, 3, 4, 5]
 
         if message.created_at.hour in happy_hours:
             await self.social_reward(message.author.id, 10, "night-owl")
